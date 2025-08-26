@@ -1,89 +1,109 @@
-// Function to initialize the QR code scanner
-function initializeScanner() {
-    // Check if the scanner is already initialized
-    if (window.scannerInitialized) return;
-    
-    // Create a container for the scanner
-    const scannerContainer = document.createElement('div');
-    scannerContainer.id = 'qr-reader';
-    scannerContainer.style.width = '500px';
-    scannerContainer.style.margin = '0 auto';
-    
-    // Add the container to the body
-    document.body.appendChild(scannerContainer);
-    
-    // Initialize the scanner
-    const html5QrCode = new Html5Qrcode("qr-reader");
-    
-    // Function to start scanning
-    const startScanning = () => {
-        html5QrCode.start(
-            { facingMode: "environment" }, // Use back camera by default
-            {
-                fps: 10,    // Optional, frame per second for scan
-                qrbox: { width: 250, height: 250 } 
-                 // Optional, if you want bounded box UI
-                 supportedFormats: [
-                    Html5QrcodeSupportedFormats.EAN_13,
-                    Html5QrcodeSupportedFormats.EAN_8,
-                    Html5QrcodeSupportedFormats.UPC_A,
-                    Html5QrcodeSupportedFormats.UPC_E,
-                    Html5QrcodeSupportedFormats.CODE_39,
-                    Html5QrcodeSupportedFormats.CODE_128
-                  ]
-            },
-           
-            (decodedText, decodedResult) => {
-                // Handle the scanned code
-                console.log('Barcode detected:', decodedText);
-                
-                // Stop scanning after detection
-                html5QrCode.stop().then(ignore => {
-                    console.log('QR Code scanning stopped.');
-                }).catch(err => {
-                    console.log('Error stopping scanner', err);
-                });
-                
-                // Optionally show the result to the user
-                alert(`Scanned: ${decodedText}`);
-            },
-            (errorMessage) => {
-                // Parse error, ignore if it's just not found error
-                console.log('Scan error:', errorMessage);
-            }
-        ).catch(err => {
-            console.error("Error starting scanner:", err);
-        });
-    };
-    
-    // Add click handler for the scan button
-    document.getElementById('scanButton').addEventListener('click', function() {
-        if (!html5QrCode.isScanning) {
-            startScanning();
-        }
-    });
-    
-    window.scannerInitialized = true;
+// * set prices for different materials
+let baseFactor = 10;
+let pricePlastic = 1;
+let priceCan = 1.2;
+let priceGlass = 1.5;
+let pointExchangeRate = 0.25;
+
+function onScanSuccess(decodedText, decodedResult) {
+ // console.log(`Barcode Scanned: ${decodedText}`);
+  //console.log("Scan result:", decodedResult);
+
+//   call api to get product details and filter data
+  filterData(decodedText);
 }
 
-// Load the HTML5 QR Code library and initialize the scanner
-function loadQRScanner() {
-    // Check if the script is already loaded
-    if (window.Html5Qrcode) {
-        initializeScanner();
+function onScanError(error) {
+  console.warn(`Scan Error: ${error}`);
+}
+
+// Initialize scanner
+let html5QrcodeScanner = new Html5QrcodeScanner("scanner-container", {
+  fps: 20,
+  qrbox: 250,
+  supportedFormats: [
+    Html5QrcodeSupportedFormats.EAN_13,
+    Html5QrcodeSupportedFormats.EAN_8,
+    Html5QrcodeSupportedFormats.UPC_A,
+    Html5QrcodeSupportedFormats.UPC_E,
+    Html5QrcodeSupportedFormats.CODE_39,
+    Html5QrcodeSupportedFormats.CODE_128,
+  ],
+});
+html5QrcodeScanner.render(onScanSuccess, onScanError);
+
+function filterData(barcode) {
+  fetch(`../api/products.php?barcode=${barcode}`)
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.status === "error") {
+        console.log("Error:", data.error);
+        alert("Product not found");
+        window.location.reload();
         return;
-    }
-    
-    // Create and append the script tag
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/html5-qrcode';
-    script.onload = initializeScanner;
-    document.head.appendChild(script);
+      } else {
+       // console.log("Clean Data:", data);
+       // console.log(data.data.quantity);
+        document.getElementById("scan-result").classList.remove("hidden");
+        document.getElementById("bottle-name").textContent =
+          data.data.name + " " + data.data.quantity;
+        document.getElementById("bottle-barcode").textContent =
+          data.data.barcode;
+
+        let rewardPoints;
+        let co2Saved;
+        if (data.data.material === "plastic") {
+          rewardPoints = Math.round(
+            baseFactor * data.data.quantitySum * pricePlastic );
+            co2Saved = Math.round(
+              82.8 * data.data.quantitySum * pricePlastic );
+
+          
+        } else if (data.data.material === "can") {
+          rewardPoints = Math.round(
+            baseFactor * data.data.quantitySum * priceCan
+          );
+          co2Saved = Math.round(
+            300 * data.data.quantitySum * priceCan
+          );
+        } else if (data.data.material === "glass") {
+          rewardPoints = Math.round(
+            baseFactor * data.data.quantitySum * priceGlass
+          );
+          co2Saved = Math.round(
+            60 * data.data.quantitySum * priceGlass
+          );
+        } else {
+          rewardPoints = Math.round(
+            baseFactor * data.data.quantity * pricePlastic
+          );
+          co2Saved = Math.round(
+            82.8 * data.data.quantity * pricePlastic
+          );
+        }
+        
+            
+        document.getElementById("cash-value").textContent ="₹" + Math.round(rewardPoints*pointExchangeRate);
+        document.getElementById("reward-points").textContent = rewardPoints;
+        document.getElementById("co2-saved").textContent = co2Saved;
+      }
+
+    })
+    .catch((err) => console.error("Request Failed", err));
 }
 
-// Initialize when the DOM is fully loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadQRScanner);
-} else {
-    loadQRScanner();
-}
+// function loadHtml5Qrcode() {
+//     const scriptPath = "https://unpkg.com/html5-qrcode";
+         
+//                       const script = document.createElement("script");
+//                       script.src = scriptPath;
+//                       script.defer = true;
+//                       document.body.appendChild(script);
+//                       loadedScripts.add(scriptPath);
+                  
+
+// }
+
+// document.addEventListener("DOMContentLoaded", () => {
+//     loadHtml5Qrcode()
+// });

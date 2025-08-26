@@ -7,8 +7,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>EcoCycle Dashboard</title>
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
+    <?php include "../includes/topInfo.php"; ?>
+   
 
     <style>
         @import url('../assets/css/deshboard.css');
