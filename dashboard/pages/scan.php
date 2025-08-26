@@ -15,55 +15,36 @@
             </div>
 
             <!-- Camera Scanner Section -->
-            <div class="glass rounded-2xl p-6 mb-6 card-hover">
-                <div class="text-center mb-6">
-                    <h2 class="text-2xl font-semibold text-white mb-2">Camera Scanner</h2>
-                    <p class="text-gray-400">Make sure the barcode is clearly visible and well-lit</p>
-                </div>
-
-                <!-- Camera Preview Container -->
-                <div class="relative mx-auto max-w-lg">
-                    <div id="scanner-container" class="glass rounded-2xl overflow-hidden relative">
-                        <video id="camera-feed" class="w-full h-full object-cover rounded-2xl" autoplay muted playsinline></video>
-
-                        <!-- Scan Overlay -->
-                        <div class="scan-overlay" id="scan-overlay">
-                            <div class="scan-line"></div>
-                        </div>
-
-                        <!-- Camera placeholder when not active -->
-                        <div id="camera-placeholder" class="absolute inset-0 flex items-center justify-center bg-gray-800 rounded-2xl">
-                            <div class="text-center">
-                                <svg class="w-24 h-24 text-gray-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                <p class="text-gray-400 text-lg">Camera Ready</p>
-                                <p class="text-gray-500 text-sm">Click start to begin scanning</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Control Buttons -->
-                <div class="flex justify-center gap-4 mt-6">
-                    <button id="start-scan-btn"
-                        class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg">
-                        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h8m-10-9v12a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2z"></path>
-                        </svg>
-                        Start Scanning
-                    </button>
-                    <button id="stop-scan-btn"
-                        class="hidden bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-300 shadow-lg">
-                        <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z"></path>
-                        </svg>
-                        Stop Scanner
-                    </button>
-                </div>
+            <div class="p-6">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Scan QR Code</h2>
+            
+            <!-- Scanner container will be inserted here by JavaScript -->
+            <div id="scanner-container" class="mb-6">
+                <div id="qr-reader" class="mb-4"></div>
+                <button id="scanButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg flex items-center justify-center w-full sm:w-auto mx-auto">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1z"></path>
+                    </svg>
+                    Start Scanning
+                </button>
             </div>
+            
+            <!-- Results will be displayed here -->
+            <div id="scan-results" class="mt-6 p-4 bg-gray-100 rounded-lg hidden">
+                <h3 class="font-semibold text-lg mb-2">Scan Result:</h3>
+                <p id="scan-result-text" class="break-words"></p>
+            </div>
+            
+            <!-- Hidden form for form submission (if needed) -->
+            <form id="scan-form" method="post" class="hidden">
+                <input type="hidden" name="barcode" id="barcode-input">
+            </form>
+        </div>
+    </div>
+</div>
+
 
             <!-- Scan Result Section (Hidden by default) -->
             <div id="scan-result" class="glass rounded-2xl p-6 mb-6 card-hover hidden">
