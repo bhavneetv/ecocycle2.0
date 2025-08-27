@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>EcoCycle Dashboard</title>
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+  
     <?php include "../includes/topInfo.php"; ?>
    
 
@@ -33,14 +33,5 @@
 
 </body>
 <script src="../assets/js/deshboardA.js"></script>
-
-<script>
-   
-</script>
-
-
-<script>
-    
-</script>
 <script src="app.js"></script>
 </html>

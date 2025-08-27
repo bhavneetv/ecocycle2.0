@@ -1,9 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
     const mainContent = document.getElementById("main-content");
     const links = document.querySelectorAll("a[data-page]");
-    const loadedScripts = new Set(); // ✅ Track loaded scripts
+    const loadedScripts = new Set();
+    const commonScript = "../assets/js/deshboardA.js";
+    const qrScript = "https://unpkg.com/html5-qrcode";
 
-    // Handle menu clicks
+    loadScript(commonScript);
+
     links.forEach(link => {
         link.addEventListener("click", e => {
             e.preventDefault();
@@ -14,37 +17,27 @@ document.addEventListener("DOMContentLoaded", () => {
             const page = link.getAttribute("data-page");
             document.getElementById("pageTitle").textContent = page;
 
-            // Update URL without reloading
             history.pushState({ page }, "", `?page=${page}`);
 
-            // Load new content
             loadPage(page);
         });
     });
 
-    // Function to load page content dynamically
     function loadPage(page) {
         fetch(`pages/${page}.php`)
             .then(res => res.text())
             .then(html => {
                 mainContent.innerHTML = html;
 
-                // ✅ Load page-specific JS file dynamically if not already loaded
                 const scriptPath = `../assets/js/${page}.js`;
-                if (!loadedScripts.has(scriptPath)) {
-                    fetch(scriptPath, { method: "HEAD" }) // check if file exists
-                        .then(res => {
-                            if (res.ok) {
-                                const script = document.createElement("script");
-                                script.src = scriptPath;
-                                script.defer = true;
-                                document.body.appendChild(script);
-                                loadedScripts.add(scriptPath);
-                            }
-                        })
-                        .catch(() => {
-                            // No script file for this page → ignore
-                        });
+                loadScript(scriptPath);
+
+                if (page === "scan") {
+                    ensureQrScript(() => {
+                        if (typeof initQrScanner === "function") {
+                            initQrScanner();
+                        }
+                    });
                 }
             })
             .catch(() => {
@@ -52,7 +45,29 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    // Handle back/forward buttons
+    function loadScript(src, callback) {
+        if (loadedScripts.has(src)) {
+            if (callback) callback();
+            return;
+        }
+        const script = document.createElement("script");
+        script.src = src;
+        script.defer = true;
+        script.onload = () => {
+            loadedScripts.add(src);
+            if (callback) callback();
+        };
+        document.body.appendChild(script);
+    }
+
+    function ensureQrScript(callback) {
+        if (typeof Html5Qrcode !== "undefined") {
+            if (callback) callback();
+        } else {
+            loadScript(qrScript, callback);
+        }
+    }
+
     window.addEventListener("popstate", () => {
         const params = new URLSearchParams(window.location.search);
         const page = params.get("page") || "dashboard";
@@ -65,7 +80,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Load page on refresh
     const params = new URLSearchParams(window.location.search);
     const currentPage = params.get("page") || "dashboard";
     loadPage(currentPage);

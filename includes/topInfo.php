@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 <link rel="stylesheet" href="../assets/css/commonUser.css">
 
-<script src="../assets/js/deshboardA.js"></script>
+<!-- <script src="../assets/js/deshboardA.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<!-- <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script> -->
     <!-- <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script> -->

@@ -1,5 +1,28 @@
 <!-- Main Content -->
- 
+<style>
+    .loader {
+        width: fit-content;
+        font-weight: bold;
+        font-family: sans-serif;
+        font-size: 30px;
+        padding-bottom: 8px;
+        background: linear-gradient(currentColor 0 0) 0 100%/0% 3px no-repeat;
+        animation: l2 2s linear infinite;
+    }
+
+    .loader:before {
+        content: "Loading..."
+    }
+
+    @keyframes l2 {
+        to {
+            background-size: 100% 3px
+        }
+    }
+</style>
+<div id="blackScreen" class="blackScreen hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; justify-content: center; align-items: center; z-index: 9999;">
+    <div class="loader"></div>
+</div>
 
 <?php include "../../includes/topInfo.php"; ?>
 <main class="pt-16 lg:pl-64 min-h-screen">
@@ -23,19 +46,10 @@
 
                     <!-- Scanner container will be inserted here by JavaScript -->
                     <div id="scanner-container" class="mb-6" style="color: blue;">
-                      
+
                     </div>
 
-                    <!-- Results will be displayed here -->
-                    <div id="scan-results" class="mt-6 p-4 bg-gray-100 rounded-lg hidden">
-                        <h3 class="font-semibold text-lg mb-2">Scan Result:</h3>
-                        <p id="scan-result-text" class="break-words"></p>
-                    </div>
 
-                    <!-- Hidden form for form submission (if needed) -->
-                    <form id="scan-form" method="post" class="hidden">
-                        <input type="hidden" name="barcode" id="barcode-input">
-                    </form>
                 </div>
             </div>
         </div>
@@ -61,22 +75,22 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
                         </svg>
                     </div>
-                    <h4 id="bottle-name" class="text-xl font-semibold text-white mb-2">Coca Cola 500ml</h4>
-                    <p id="bottle-barcode" class="text-gray-400 text-sm font-mono">Barcode: 123456789012</p>
+                    <h4 id="bottle-name" class="text-xl font-semibold text-white mb-2"></h4>
+                    <p id="bottle-barcode" class="text-gray-400 text-sm font-mono">Barcode: </p>
                 </div>
 
                 <div class="border-t border-white/20 pt-4">
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-gray-400">Reward Points:</span>
-                        <span id="reward-points" class="text-2xl font-bold text-green-400">+15</span>
+                        <span id="reward-points" class="text-2xl font-bold text-green-400"></span>
                     </div>
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-gray-400">Cash Value:</span>
-                        <span id="cash-value" class="text-xl font-semibold text-blue-400">₹3</span>
+                        <span id="cash-value" class="text-xl font-semibold text-blue-400"></span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-400">CO₂ Saved:</span>
-                        <span id="co2-saved" class="text-lg font-medium text-green-400">0.5kg</span>
+                        <span id="co2-saved" class="text-lg font-medium text-green-400"></span>
                     </div>
                 </div>
 
