@@ -3,6 +3,18 @@ design complete
 logic complete 
 api complete 
 
-backend pending
+backend complete
+database complete
+frontend complete
+
+scan complete
+
+dashboard start
+design comp
+logic comp
+backend comp
+
+reward start
+design 
 
 ---> 

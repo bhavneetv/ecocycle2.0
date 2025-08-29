@@ -97,9 +97,16 @@
                 <!-- Action Buttons -->
                 <div class="flex gap-3 mt-6">
                     <button id="confirm-recycle-btn"
-                        class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300">
-                        Confirm Recycle
+                        class="flex items-center justify-center gap-2 flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300">
+                        <svg id="loading-spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                        <span id="button-text">Confirm Recycle</span>
                     </button>
+
                     <button id="scan-another-btn"
                         class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300">
                         Scan Another

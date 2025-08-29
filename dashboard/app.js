@@ -46,10 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function loadScript(src, callback) {
-        if (loadedScripts.has(src)) {
-            if (callback) callback();
-            return;
-        }
+     
         const script = document.createElement("script");
         script.src = src;
         script.defer = true;

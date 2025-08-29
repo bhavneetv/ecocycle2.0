@@ -1,4 +1,39 @@
 <!-- Main Content -->
+<?php include "../../config/conn.php";
+session_start();
+
+if (!isset($_SESSION['User'])) {
+
+    $fullname = "Guest";
+    $user_id = "Guest";
+    $reward_points = "0";
+    $co2_saved = "0";
+    $wallet = "0";
+    $total_bottles = "0";
+    $streak_count = "0";
+    $b = "0";
+} else {
+
+
+    $sql = "SELECT * FROM users WHERE email = '$_SESSION[User]'";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    $fullname = $row['full_name'];
+    $user_id = $row['user_id'];
+    $reward_points = $row['total_points'];
+    $redeemed_points = $row['redeemed_points'];
+
+    $b = $row['bottleBeforeRedeem'];
+    $co2_saved = round($row['carbonFree']) / 1000;
+    $wallet = $reward_points * 0.25;
+    $streak_count = $row['streak_count'];
+}
+
+
+
+
+
+?>
 <main class="pt-16 lg:pl-64 min-h-screen">
     <div class="p-6">
         <!-- Page Title -->
@@ -16,8 +51,9 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-gray-400 text-sm">Total Rewards Earned</p>
-                        <p id="totalPoints" class="text-4xl font-bold text-white counter-animation">0</p>
-                        <p class="text-green-400 text-sm mt-1">+127 this week</p>
+                        <p id="totalPoints" class="text-4xl font-bold text-white counter-animation"><?php echo  $reward_points; ?></p>
+                        <p class="text-blue-400 text-sm mt-1">Total: ₹<span id="redeemedValue"> <?php echo $reward_points * 0.25; ?></span> value</p>
+
                     </div>
                     <div class="w-16 h-16 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-xl flex items-center justify-center">
                         <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,9 +61,7 @@
                         </svg>
                     </div>
                 </div>
-                <div class="w-full bg-gray-700/30 rounded-full h-2">
-                    <div class="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-1000" style="width: 0%" id="progressBar"></div>
-                </div>
+
             </div>
 
             <!-- Redeemed Rewards Card -->
@@ -35,8 +69,8 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm">Total Redeemed</p>
-                        <p id="redeemedPoints" class="text-3xl font-bold text-white counter-animation">0</p>
-                        <p class="text-blue-400 text-sm mt-1">₹<span id="redeemedValue">0</span> value</p>
+                        <p id="redeemedPoints" class="text-3xl font-bold text-white counter-animation"><?php echo $redeemed_points; ?></p>
+                        <p class="text-blue-400 text-sm mt-1">₹<span id="redeemedValue"><?php echo $redeemed_points * 0.25; ?></span> value</p>
                     </div>
                     <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,8 +85,10 @@
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-gray-400 text-sm">Available Balance</p>
-                        <p id="availablePoints" class="text-3xl font-bold text-white counter-animation">0</p>
-                        <p class="text-yellow-400 text-sm mt-1">Ready to redeem</p>
+                        <p id="availablePoints" class="text-3xl font-bold text-white counter-animation"><?php echo $reward_points - $redeemed_points; ?></p>
+                        <p class="text-blue-400 text-sm mt-1">₹<span id="redeemedValue"><?php echo round(($reward_points - $redeemed_points) * 0.25, 2); ?></span> value</p>
+                        <p class="text-blue-400 text-sm mt-1" id="bottleBeforeRedeemt"> <?php echo $b; ?> Bottles to be collected</p>
+                        <p class="text-yellow-400 text-sm mt-1" id="redeemText">Ready to redeem</p>
                     </div>
                     <div class="w-12 h-12 bg-yellow-500/20 rounded-lg flex items-center justify-center">
                         <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,9 +96,18 @@
                         </svg>
                     </div>
                 </div>
-                <button class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
-                    Redeem Now
+                <button id="redeemBtn"
+                    class="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2">
+                    <svg id="btnLoaderR" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z">
+                        </path>
+                    </svg>
+                    <span id="btnText">Redeem Now</span>
                 </button>
+
             </div>
         </div>
 
@@ -74,13 +119,15 @@
                     <thead>
                         <tr class="border-b border-gray-600">
                             <th class="text-left py-3 px-4 text-gray-300 font-medium">Date</th>
-                            <th class="text-left py-3 px-4 text-gray-300 font-medium">Activity</th>
-                            <th class="text-left py-3 px-4 text-gray-300 font-medium">Bottle</th>
-                            <th class="text-left py-3 px-4 text-gray-300 font-medium">Points</th>
+                            <th class="text-left py-3 px-4 text-gray-300 font-medium">Recycler Name</th>
+                            <th class="text-left py-3 px-4 text-gray-300 font-medium">Total Bottles</th>
+                            <th class="text-left py-3 px-4 text-gray-300 font-medium">Points deducted</th>
                             <th class="text-left py-3 px-4 text-gray-300 font-medium">Status</th>
                         </tr>
                     </thead>
                     <tbody id="activityTable">
+                        <!-- Activity rows will be populated by JavaScript -->
+                       
                         <!-- Activity rows will be populated by JavaScript -->
                     </tbody>
                 </table>
@@ -100,7 +147,7 @@
                     </div>
                     <h4 class="text-white font-semibold mb-1">Plastic Saver</h4>
                     <p class="text-gray-400 text-sm mb-2">Recycle 100+ bottles</p>
-                    <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs">Earned</span>
+                    <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs" id="plasticSaver"></span>
                 </div>
 
                 <!-- Eco Hero Badge -->
@@ -112,7 +159,7 @@
                     </div>
                     <h4 class="text-white font-semibold mb-1">Eco Hero</h4>
                     <p class="text-gray-400 text-sm mb-2">Save 10kg+ CO₂</p>
-                    <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs">Earned</span>
+                    <span class="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs" id="ecoHero"></span>
                 </div>
 
                 <!-- Top Recycler Badge -->
@@ -124,7 +171,7 @@
                     </div>
                     <h4 class="text-white font-semibold mb-1">Top Recycler</h4>
                     <p class="text-gray-400 text-sm mb-2">Recycle 500+ bottles</p>
-                    <span class="bg-gray-600/40 text-gray-400 px-3 py-1 rounded-full text-xs">247/500</span>
+                    <span class="bg-gray-600/40 text-gray-400 px-3 py-1 rounded-full text-xs " id="topRecycler">247/500</span>
                 </div>
 
                 <!-- Weekly Champion Badge -->
@@ -136,7 +183,7 @@
                     </div>
                     <h4 class="text-white font-semibold mb-1">Weekly Champion</h4>
                     <p class="text-gray-400 text-sm mb-2">Top recycler this week</p>
-                    <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs">Earned</span>
+                    <span class="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-full text-xs" id="weeklyChampion"></span>
                 </div>
 
                 <!-- Streak Master Badge -->
@@ -148,7 +195,7 @@
                     </div>
                     <h4 class="text-white font-semibold mb-1">Streak Master</h4>
                     <p class="text-gray-400 text-sm mb-2">30-day recycle streak</p>
-                    <span class="bg-gray-600/40 text-gray-400 px-3 py-1 rounded-full text-xs">7/30 days</span>
+                    <span class="bg-gray-600/40 text-gray-400 px-3 py-1 rounded-full text-xs" id="streakMaster"></span>
                 </div>
 
                 <!-- Community Leader Badge -->
@@ -168,6 +215,5 @@
 
     <script>
         // Sample reward data - replace with actual API call
-   
     </script>
 </main>

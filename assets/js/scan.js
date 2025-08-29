@@ -110,6 +110,23 @@ function filterData(barcode) {
           "₹" + Math.round(rewardPoints * pointExchangeRate);
         document.getElementById("reward-points").textContent = rewardPoints;
         document.getElementById("co2-saved").textContent = co2Saved + " g";
+
+        document
+          .getElementById("confirm-recycle-btn")
+          .addEventListener("click", () => {
+            //alert("Product scanned successfully");
+            document
+              .getElementById("loading-spinner")
+              .classList.remove("hidden");
+            this.disabled = true;
+            requestPhp(
+              barcode,
+              data.data.name,
+              rewardPoints,
+              data.data.quantitySum,
+              co2Saved
+            );
+          });
       } else {
         console.log("Invalid data");
         document.getElementById("blackScreen").style.display = "none";
@@ -119,4 +136,33 @@ function filterData(barcode) {
       }
     })
     .catch((err) => console.error("Request Failed", err));
+}
+
+
+// * request to store.php
+function requestPhp(barcode, name, points, quantity, co2Saved) {
+  $.ajax({
+    url: "../api/scanStore.php",
+    type: "POST",
+    data: {
+      barcode: barcode,
+      name: name,
+      points: points,
+      quantity: quantity,
+      co2Saved: co2Saved,
+    },
+    success: function (data) {
+      console.log(data);
+      if (data.error) {
+        alert(data.error);
+        document.getElementById("loading-spinner").classList.add("hidden");
+        document.getElementById("confirm-recycle-btn").disabled = false;
+      } else {
+        document.getElementById("loading-spinner").classList.add("hidden");
+        document.getElementById("confirm-recycle-btn").disabled = false;
+        alert(data);
+        //window.location.reload();
+      }
+    },
+  });
 }
